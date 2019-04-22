@@ -1,6 +1,6 @@
 name: nested_navigators
-description: Flutter widget to implementing multiple stacks routes with the ability to select the current displayed navigator from the outside.
-version: 1.0.3
+description: Flutter widget for implementing multiple nested navigators with their own route stacks.
+version: 1.0.4
 author: Vlad Baranov<novah2505@gmail.com>
 homepage: https://github.com/n0vah/nested_navigators
 
