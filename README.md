@@ -1,6 +1,6 @@
 # NestedNavigators
 
-Flutter widget to implement multiple route stacks.
+Flutter widget for implementing multiple nested navigators with their own route stacks.
 
 # Usage
 To use, you must at least specify two arguments **items** and **generateRoute**:
