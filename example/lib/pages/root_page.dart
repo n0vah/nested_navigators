@@ -31,7 +31,20 @@ class _RootPageState extends State<RootPage> {
         ),
       },
       generateRoute: Routes.generateRoute,
-      buildBottomNavigationItem: (key, item, selected) => BottomNavigationBarItem(
+      drawer: (items, selectedItemKey, selectNavigator) => Drawer(
+            child: ListView(
+              children:
+                  _buildDrawersItems(items, selectedItemKey, selectNavigator),
+            ),
+          ),
+      endDrawer: (items, selectedItemKey, selectNavigator) => Drawer(
+            child: ListView(
+              children:
+                  _buildDrawersItems(items, selectedItemKey, selectNavigator),
+            ),
+          ),
+      buildBottomNavigationItem: (key, item, selected) =>
+          BottomNavigationBarItem(
             icon: Icon(
               item.icon,
               color: Colors.blue,
@@ -45,5 +58,27 @@ class _RootPageState extends State<RootPage> {
         splashColor: Colors.blue[100],
       ),
     );
+  }
+
+  List<ListTile> _buildDrawersItems(
+    Map<NestedNavItemKey, NestedNavigatorItem> items,
+    NestedNavItemKey selectedItemKey,
+    Function(NestedNavItemKey) selectNavigator,
+  ) {
+    return items.entries
+        .map((entry) => ListTile(
+              title: Text(
+                entry.value.text,
+                style: TextStyle(
+                  color: entry.key == selectedItemKey ? Colors.blue : null,
+                ),
+              ),
+              trailing: Icon(
+                entry.value.icon,
+                color: entry.key == selectedItemKey ? Colors.blue : null,
+              ),
+              onTap: () => selectNavigator(entry.key),
+            ))
+        .toList();
   }
 }

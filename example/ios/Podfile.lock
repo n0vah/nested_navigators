@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - nested_navigators (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `.symlinks/flutter/ios`)
+  - nested_navigators (from `.symlinks/plugins/nested_navigators/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: ".symlinks/flutter/ios"
+  nested_navigators:
+    :path: ".symlinks/plugins/nested_navigators/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
+  nested_navigators: fdadb3e96b2b20ddd5eaf4e2370a7ae194b2e952
+
+PODFILE CHECKSUM: aff02bfeed411c636180d6812254b2daeea14d09
+
+COCOAPODS: 1.5.3

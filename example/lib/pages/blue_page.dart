@@ -33,8 +33,8 @@ class BluePage extends StatelessWidget {
               text: "open new page",
               onPressed: () {
                 Navigator.of(context).pushNamed(
-                    Routes.blue,
-                    arguments: value + 1,
+                  Routes.blue,
+                  arguments: value + 1,
                 );
               },
             ),
@@ -50,7 +50,26 @@ class BluePage extends StatelessWidget {
             _item(
               text: "select green tab",
               onPressed: () {
-                NestedNavigatorsBlocProvider.of(context).select(NestedNavItemKey.green);
+                NestedNavigatorsBlocProvider.of(context)
+                    .select(NestedNavItemKey.green);
+              },
+            ),
+            _divider(),
+            _item(
+              text: "open left drawer",
+              onPressed: () {
+                NestedNavigatorsBlocProvider.of(context).actionWithScaffold(
+                  (scaffoldState) => scaffoldState.openDrawer(),
+                );
+              },
+            ),
+            _divider(),
+            _item(
+              text: "open right drawer",
+              onPressed: () {
+                NestedNavigatorsBlocProvider.of(context).actionWithScaffold(
+                  (scaffoldState) => scaffoldState.openEndDrawer(),
+                );
               },
             ),
           ],
@@ -59,8 +78,7 @@ class BluePage extends StatelessWidget {
     );
   }
 
-  _item({String text, Function() onPressed}) =>
-      FlatButton(
+  _item({String text, Function() onPressed}) => FlatButton(
         child: Text(
           text,
           textAlign: TextAlign.center,
@@ -69,8 +87,7 @@ class BluePage extends StatelessWidget {
         onPressed: onPressed,
       );
 
-  _divider() =>
-      Flexible(
+  _divider() => Flexible(
         child: Container(
           margin: EdgeInsets.symmetric(vertical: 8),
           color: Colors.white,

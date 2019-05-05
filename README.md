@@ -96,7 +96,7 @@ clearStackAfterTapOnCurrentTab: false
 ```
 When you navigate to another route within nested navigator, you can hide *BottomNavigatorsBar* for specific route, just add **hideNavTabBar: true** to route arguments:
 ```dart
- Navigator.of(context).pushNamed(
+Navigator.of(context).pushNamed(
                     Routes.red,
                     arguments: {
                       hideNavTabBar: true,
@@ -140,4 +140,35 @@ class _AppState extends State<App> {
     );
   }
 }
+```
+You can use *Drawer* instead of *BottomNavigationBar*, use **drawer** or **endDrawer** for this:
+```dart
+drawer: (items, selectedItemKey, selectNavigator) => Drawer(
+            child: ListView(
+              children: items.entries
+                  .map((entry) => ListTile(
+                        title: Text(
+                          entry.value.text,
+                          style: TextStyle(
+                            color: entry.key == selectedItemKey
+                                ? Colors.blue
+                                : null,
+                          ),
+                        ),
+                        trailing: Icon(
+                          entry.value.icon,
+                          color:
+                              entry.key == selectedItemKey ? Colors.blue : null,
+                        ),
+                        onTap: () => selectNavigator(entry.key),
+                      ))
+                  .toList(),
+            ),
+          ),
+```
+Also you can open drawers from your pages:
+```dart
+NestedNavigatorsBlocProvider.of(context).actionWithScaffold(
+                  (scaffoldState) => scaffoldState.openDrawer(),
+                );
 ```

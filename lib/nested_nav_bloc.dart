@@ -17,6 +17,9 @@ class NestedNavigatorsBloc<T> {
 
   final _tabBarVisibilityController = StreamController<bool>.broadcast();
 
+  final _actionWithScaffoldController =
+      StreamController<Function(ScaffoldState scaffoldState)>.broadcast();
+
   Stream<T> get outSelectTab => _selectNavigatorController.stream;
 
   Stream<MapEntry<T, Function(NavigatorState navigator)>>
@@ -24,6 +27,9 @@ class NestedNavigatorsBloc<T> {
           _selectNavigatorAndNavigateController.stream;
 
   Stream<bool> get outTabBarVisibility => _tabBarVisibilityController.stream;
+
+  Stream<Function(ScaffoldState scaffoldState)> get outActionWithScaffold =>
+      _actionWithScaffoldController.stream;
 
   /// Select nested navigator
   select(T key) {
@@ -46,9 +52,14 @@ class NestedNavigatorsBloc<T> {
     }
   }
 
+  actionWithScaffold(Function(ScaffoldState scaffoldState) action) {
+    _actionWithScaffoldController.sink.add(action);
+  }
+
   void dispose() {
     _selectNavigatorController.close();
     _selectNavigatorAndNavigateController.close();
     _tabBarVisibilityController.close();
+    _actionWithScaffoldController.close();
   }
 }

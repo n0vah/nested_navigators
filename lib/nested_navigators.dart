@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:nested_navigators/nested_nav_bloc.dart';
 import 'package:nested_navigators/nested_nav_bloc_provider.dart';
@@ -29,6 +30,9 @@ class NestedNavigators<T> extends StatefulWidget {
     BottomNavigationBarItem Function(
             T key, NestedNavigatorItem item, bool selected)
         buildBottomNavigationItem,
+    this.drawer,
+    this.endDrawer,
+    this.drawerDragStartBehavior = DragStartBehavior.down,
     this.buildCustomBottomNavigationItem,
     this.bottomNavigationBarTheme,
     this.showBottomNavigationBar = true,
@@ -94,7 +98,46 @@ class NestedNavigators<T> extends StatefulWidget {
   ///          ))
   /// ```
   final BottomNavigationBarItem Function(
-      T key, NestedNavigatorItem item, bool selected) buildBottomNavigationItem;
+    T key,
+    NestedNavigatorItem item,
+    bool selected,
+  ) buildBottomNavigationItem;
+
+  /// A panel displayed to the side of the [body], often hidden on mobile
+  /// devices. Swipes in from right-to-left ([TextDirection.ltr]) or
+  /// left-to-right ([TextDirection.rtl])
+  ///
+  /// Typically a [Drawer].
+  final Widget Function(
+    Map<T, NestedNavigatorItem> items,
+    T selectedItemKey,
+    Function(T) selectNavigator,
+  ) drawer;
+
+  /// A panel displayed to the side of the [body], often hidden on mobile
+  /// devices. Swipes in from either left-to-right ([TextDirection.ltr]) or
+  /// right-to-left ([TextDirection.rtl])
+  ///
+  /// Typically a [Drawer].
+  final Widget Function(
+    Map<T, NestedNavigatorItem> items,
+    T selectedItemKey,
+    Function(T) selectNavigator,
+  ) endDrawer;
+
+  /// Determines the way that drag start behavior is handled.
+  ///
+  /// If set to [DragStartBehavior.start], the drag behavior used for opening
+  /// and closing a drawer will begin upon the detection of a drag gesture.
+  /// If set to [DragStartBehavior.down] it will begin when a down event is
+  /// first detected.
+  ///
+  /// In general, setting this to [DragStartBehavior.start] will make drag
+  /// animation smoother and setting it to [DragStartBehavior.down] will make
+  /// drag behavior feel slightly more reactive.
+  ///
+  /// By default, the drag start behavior is [DragStartBehavior.down].
+  final DragStartBehavior drawerDragStartBehavior;
 
   /// Use this builder if [BottomNavigationBarItem] is not enough for you, and you want to use your own tab item design.
   ///
@@ -119,8 +162,11 @@ class NestedNavigators<T> extends StatefulWidget {
   ///            ),
   ///          ),
   ///```
-  final Widget Function(T key, NestedNavigatorItem item, bool selected)
-      buildCustomBottomNavigationItem;
+  final Widget Function(
+    T key,
+    NestedNavigatorItem item,
+    bool selected,
+  ) buildCustomBottomNavigationItem;
 
   /// Define your owen theme of bottom navigation bar with splashColor for using different ripple effect color, or selected state icon and text color.
   ///
@@ -157,7 +203,6 @@ class NestedNavigators<T> extends StatefulWidget {
 
   static T _defaultInitialSelectedNavigatorKey<T>(Iterable<T> keys) {
     int size = keys.length;
-    print((size / 2).floor() + 1);
     return size % 2 == 0 ? keys.first : keys.elementAt((size / 2).floor());
   }
 
@@ -168,6 +213,7 @@ class NestedNavigators<T> extends StatefulWidget {
 class _NestedNavigatorsState<T> extends State<NestedNavigators> {
   NestedNavigatorsBloc<T> _bloc;
   bool _hasBlocProviderInTree = false;
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
 
   Map<T, NestedNavigatorItem> get _items => widget.items;
 
@@ -193,12 +239,18 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
     // Set the bottom navigation bar visibility when nested navigator selected
     // by using NestedNavigatorsBloc.select() or NestedNavigatorsBloc.selectAndNavigate()
     _bloc.outSelectTab.listen(
-        (key) => _bloc.setTabBarVisibility(_items[key].navTabBarVisible));
+      (key) => _bloc.setTabBarVisibility(_items[key].navTabBarVisible),
+    );
 
     // Listen queries from widget which was added to widget tree with using root navigator,
     // but which is child of NestedNavigatorsBlocProvider, it's will work when app widget is child of NestedNavigatorsBlocProvider
-    _bloc.outSelectTabAndNavigate
-        .listen((entry) => entry.value(_getNavigatorState(entry.key)));
+    _bloc.outSelectTabAndNavigate.listen(
+      (entry) => entry.value(_getNavigatorState(entry.key)),
+    );
+
+    _bloc.outActionWithScaffold.listen(
+      (action) => action(_scaffoldKey.currentState),
+    );
   }
 
   @override
@@ -217,6 +269,22 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
         stream: _bloc.outSelectTab,
         initialData: _bloc.selectedNavigatorKey,
         builder: (_, snapshot) => Scaffold(
+              key: _scaffoldKey,
+              drawer: widget.drawer != null
+                  ? widget.drawer(
+                      _items,
+                      _bloc.selectedNavigatorKey,
+                      (key) => _bloc.select(key),
+                    )
+                  : null,
+              endDrawer: widget.endDrawer != null
+                  ? widget.endDrawer(
+                      _items,
+                      _bloc.selectedNavigatorKey,
+                      (key) => _bloc.select(key),
+                    )
+                  : null,
+              drawerDragStartBehavior: widget.drawerDragStartBehavior,
               body: Stack(
                   children: _items.keys
                       .map((key) => _buildNavigator(key, snapshot.data))
@@ -246,12 +314,15 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
       );
 
   List<BottomNavigationBarItem> getBottomNavigatorBarItems() {
-    List<BottomNavigationBarItem> items = new List();
-    _items.forEach(
-      (key, tabItem) => items.add(widget.buildBottomNavigationItem(
-          key, tabItem, _bloc.selectedNavigatorKey == key)),
-    );
-    return items;
+    return _items.entries
+        .map(
+          (entry) => widget.buildBottomNavigationItem(
+                entry.key,
+                entry.value,
+                _bloc.selectedNavigatorKey == entry.key,
+              ),
+        )
+        .toList();
   }
 
   Widget _buildCustomBottomNavigatorBar() {
