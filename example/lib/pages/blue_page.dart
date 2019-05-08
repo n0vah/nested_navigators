@@ -13,7 +13,7 @@ class BluePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: MenuButton(context: context),
+        leading: value == 0 ? MenuButton(context: context) : null,
         title: Text(
           "Blue",
         ),

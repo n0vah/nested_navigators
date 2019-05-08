@@ -14,7 +14,7 @@ class GreenPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-         leading: MenuButton(context: context),
+        leading: value == 0 ? MenuButton(context: context) : null,
         title: Text(
           "Green",
         ),
@@ -52,7 +52,8 @@ class GreenPage extends StatelessWidget {
             _item(
               text: "select blue tab",
               onPressed: () {
-                NestedNavigatorsBlocProvider.of(context).select(NestedNavItemKey.blue);
+                NestedNavigatorsBlocProvider.of(context)
+                    .select(NestedNavItemKey.blue);
               },
             ),
           ],
