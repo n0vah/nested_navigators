@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:nested_navigators/nested_nav_bloc_provider.dart';
 
 class MenuButton extends StatelessWidget {
   MenuButton({
-    @required this.context,
     this.endDrawer = false,
     this.icon,
   });
 
   final Icon icon;
   final bool endDrawer;
-  final BuildContext context;
 
   @override
-  Widget build(BuildContext _) {
+  Widget build(BuildContext context) {
     return IconButton(
       icon: icon ?? Icon(Icons.menu),
       onPressed: () {
-        if (endDrawer) {
-          Scaffold.of(context).openEndDrawer();
-        } else {
-          Scaffold.of(context).openDrawer();
-        }
+        NestedNavigatorsBlocProvider.of(context)
+            .actionWithScaffold((scaffoldState) {
+          if (endDrawer) {
+            scaffoldState.openEndDrawer();
+          } else {
+            scaffoldState.openDrawer();
+          }
+        });
       },
     );
   }

@@ -15,7 +15,7 @@ class _RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     return NestedNavigators(
-      showBottomNavigationBar: Platform.isIOS || Platform.isAndroid,
+      showBottomNavigationBar: _isMobile,
       items: {
         NestedNavItemKey.blue: NestedNavigatorItem(
           initialRoute: Routes.blue,
@@ -62,6 +62,8 @@ class _RootPageState extends State<RootPage> {
       ),
     );
   }
+
+  bool get _isMobile => Platform.isIOS || Platform.isAndroid;
 
   List<ListTile> _buildDrawersItems(
     Map<NestedNavItemKey, NestedNavigatorItem> items,

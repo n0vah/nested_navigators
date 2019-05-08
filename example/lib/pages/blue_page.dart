@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:nested_navigators/nested_nav_bloc_provider.dart';
 import 'package:nested_navigators/nested_navigators.dart';
@@ -13,7 +15,7 @@ class BluePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: value == 0 ? MenuButton(context: context) : null,
+        leading: !_isMobile && value == 0 ? MenuButton() : null,
         title: Text(
           "Blue",
         ),
@@ -79,6 +81,8 @@ class BluePage extends StatelessWidget {
       ),
     );
   }
+
+  bool get _isMobile => Platform.isIOS || Platform.isAndroid;
 
   _item({String text, Function() onPressed}) => FlatButton(
         child: Text(
