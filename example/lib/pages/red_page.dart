@@ -14,6 +14,7 @@ class RedPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: MenuButton(context: context),
         title: Text(
           "Red",
         ),
@@ -44,7 +45,8 @@ class RedPage extends StatelessWidget {
               _item(
                 text: "open new page and replace",
                 onPressed: () {
-                  Navigator.of(context).pushReplacementNamed(Routes.red, arguments: {
+                  Navigator.of(context)
+                      .pushReplacementNamed(Routes.red, arguments: {
                     ArgumentKeys.value: value + 1,
                   });
                 },
@@ -53,9 +55,11 @@ class RedPage extends StatelessWidget {
               _item(
                 text: "open new page and remove until first",
                 onPressed: () {
-                  Navigator.of(context).pushNamedAndRemoveUntil(Routes.red, (route) => route.isFirst, arguments: {
-                    ArgumentKeys.value: value + 1,
-                  });
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      Routes.red, (route) => route.isFirst,
+                      arguments: {
+                        ArgumentKeys.value: value + 1,
+                      });
                 },
               ),
               _divider(),
@@ -75,13 +79,15 @@ class RedPage extends StatelessWidget {
               _item(
                 text: "select blue tab",
                 onPressed: () {
-                  NestedNavigatorsBlocProvider.of(context).select(NestedNavItemKey.blue);
+                  NestedNavigatorsBlocProvider.of(context)
+                      .select(NestedNavItemKey.blue);
                 },
               ),
               _divider(),
               _item(
                 text: "select green tab",
-                onPressed: () => NestedNavigatorsBlocProvider.of(context).select(NestedNavItemKey.green),
+                onPressed: () => NestedNavigatorsBlocProvider.of(context)
+                    .select(NestedNavItemKey.green),
               ),
               _divider(),
               _item(

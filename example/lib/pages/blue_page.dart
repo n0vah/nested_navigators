@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nested_navigators/nested_nav_bloc_provider.dart';
+import 'package:nested_navigators/nested_navigators.dart';
 import 'package:nested_navigators_example/nested_nav_item_key.dart';
 import 'package:nested_navigators_example/routes.dart';
 
@@ -12,6 +13,7 @@ class BluePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: MenuButton(context: context),
         title: Text(
           "Blue",
         ),

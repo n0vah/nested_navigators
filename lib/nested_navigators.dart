@@ -4,6 +4,8 @@ import 'package:nested_navigators/nested_nav_bloc.dart';
 import 'package:nested_navigators/nested_nav_bloc_provider.dart';
 import 'package:nested_navigators/nested_nav_item.dart';
 
+export 'nav_drawer.dart';
+
 /// The key for the route argument to be used to hide the [BottomNavigationBar] for this route.
 ///
 /// For example:
