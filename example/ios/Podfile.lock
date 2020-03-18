@@ -14,9 +14,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/nested_navigators/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
-  nested_navigators: fdadb3e96b2b20ddd5eaf4e2370a7ae194b2e952
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  nested_navigators: 82d1cf0dc3f43f9bf01e40ab6e90f722c0e80a3b
 
 PODFILE CHECKSUM: aff02bfeed411c636180d6812254b2daeea14d09
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.9.1
