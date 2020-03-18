@@ -35,6 +35,7 @@ class NestedNavigators<T> extends StatefulWidget {
     this.drawerDragStartBehavior = DragStartBehavior.down,
     this.buildCustomBottomNavigationItem,
     this.bottomNavigationBarTheme,
+    this.bottomNavigationBarElevation = 8,
     this.showBottomNavigationBar = true,
     this.clearStackAfterTapOnCurrentTab = true,
   })  : initialSelectedNavigatorKey = initialNavigatorKey != null
@@ -179,6 +180,8 @@ class NestedNavigators<T> extends StatefulWidget {
   /// ```
   final ThemeData bottomNavigationBarTheme;
 
+  final double bottomNavigationBarElevation;
+
   /// Set this argument as false if you want to use [Drawer] instead of [BottomNavigatorBar] for selection nested navigator
   ///
   /// Defaults to true.
@@ -308,6 +311,7 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
 
   Widget _buildNativeBottomNavigatorBar() => BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
+        elevation: widget.bottomNavigationBarElevation,
         items: getBottomNavigatorBarItems(),
         currentIndex: _getNavigatorIndexByKey(_bloc.selectedNavigatorKey),
         onTap: (index) => _onTabBarItemClick(_getNavigatorKeyByIndex(index)),
