@@ -9,9 +9,10 @@ class NestedNavigatorItem {
     this.text,
   }) {
     _navigatorObserver = _NestedNavigatorObserver(_navigatorKey);
+    _heroController = HeroController(createRectTween: _createRectTween);
 
     _navigator = new Navigator(
-      observers: <NavigatorObserver>[_navigatorObserver],
+      observers: <NavigatorObserver>[_navigatorObserver, _heroController],
       key: _navigatorKey,
       onGenerateRoute: (routeSettings) => routeSettings.name == _rootRouteName
           ? generateRoute(RouteSettings(
@@ -29,6 +30,7 @@ class NestedNavigatorItem {
   final _navigatorKey = GlobalKey<NavigatorState>();
   Navigator _navigator;
   _NestedNavigatorObserver _navigatorObserver;
+  HeroController _heroController;
   Function(RouteSettings routeSettings) generateRoute;
 
   Navigator get navigator => _navigator;
@@ -36,6 +38,10 @@ class NestedNavigatorItem {
   NavigatorState get navigatorState => _navigatorKey.currentState;
 
   bool get navTabBarVisible => _navigatorObserver.navTabBarVisible;
+
+  RectTween _createRectTween(Rect begin, Rect end) {
+    return MaterialRectArcTween(begin: begin, end: end);
+  }
 }
 
 class _NestedNavigatorObserver extends NavigatorObserver {
