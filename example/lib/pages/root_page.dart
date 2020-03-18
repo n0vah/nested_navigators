@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:nested_navigators/nested_nav_item.dart';
 import 'package:nested_navigators/nested_navigators.dart';
@@ -13,6 +15,7 @@ class _RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     return NestedNavigators(
+      showBottomNavigationBar: _isMobile,
       items: {
         NestedNavItemKey.blue: NestedNavigatorItem(
           initialRoute: Routes.blue,
@@ -59,6 +62,8 @@ class _RootPageState extends State<RootPage> {
       ),
     );
   }
+
+  bool get _isMobile => Platform.isIOS || Platform.isAndroid;
 
   List<ListTile> _buildDrawersItems(
     Map<NestedNavItemKey, NestedNavigatorItem> items,

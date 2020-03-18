@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:nested_navigators/nested_nav_bloc_provider.dart';
+import 'package:nested_navigators/nested_navigators.dart';
 import 'package:nested_navigators_example/argument_keys.dart';
 import 'package:nested_navigators_example/nested_nav_item_key.dart';
 import 'package:nested_navigators_example/routes.dart';
@@ -13,6 +16,7 @@ class GreenPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: !_isMobile && value == 0 ? MenuButton() : null,
         title: Text(
           "Green",
         ),
@@ -50,7 +54,8 @@ class GreenPage extends StatelessWidget {
             _item(
               text: "select blue tab",
               onPressed: () {
-                NestedNavigatorsBlocProvider.of(context).select(NestedNavItemKey.blue);
+                NestedNavigatorsBlocProvider.of(context)
+                    .select(NestedNavItemKey.blue);
               },
             ),
           ],
@@ -58,6 +63,8 @@ class GreenPage extends StatelessWidget {
       ),
     );
   }
+
+  bool get _isMobile => Platform.isIOS || Platform.isAndroid;
 
   _item({String text, Function() onPressed}) => FlatButton(
         child: Text(

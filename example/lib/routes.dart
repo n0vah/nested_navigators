@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:nested_navigators/nested_navigators.dart';
 
 import 'argument_keys.dart';
 import 'pages/blue_page.dart';
@@ -16,12 +17,14 @@ class Routes {
   static MaterialPageRoute generateRoute(RouteSettings routeSettings) {
     return MaterialPageRoute(
       settings: routeSettings,
-      builder: (context) => _buildPage(routeSettings.name, routeSettings.arguments),
+      builder: (context) =>
+          _buildPage(routeSettings.name, routeSettings.arguments),
     );
   }
 
   static Widget _buildPage(String name, Object arguments) {
-    Map<String, dynamic> argumentsMap = arguments is Map<String, dynamic> ? arguments : Map();
+    Map<String, dynamic> argumentsMap =
+        arguments is Map<String, dynamic> ? arguments : Map();
     switch (name) {
       case blue:
         return BluePage(
