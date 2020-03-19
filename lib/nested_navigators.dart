@@ -210,7 +210,8 @@ class NestedNavigators<T> extends StatefulWidget {
   State<NestedNavigators> createState() => _NestedNavigatorsState<T>();
 }
 
-class _NestedNavigatorsState<T> extends State<NestedNavigators> {
+class _NestedNavigatorsState<T> extends State<NestedNavigators>
+    with TickerProviderStateMixin<NestedNavigators> {
   NestedNavigatorsBloc<T> _bloc;
   bool _hasBlocProviderInTree = false;
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
@@ -222,6 +223,9 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
   T _getNavigatorKeyByIndex(int index) => _items.keys.toList().elementAt(index);
 
   int _getNavigatorIndexByKey(T key) => _items.keys.toList().indexOf(key);
+
+  Map<T, AnimationController> _faders;
+  Map<T, Key> _navigatorKeys;
 
   @override
   void initState() {
@@ -251,6 +255,14 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
     _bloc.outActionWithScaffold.listen(
       (action) => action(_scaffoldKey.currentState),
     );
+
+    _faders = _items.map<T, AnimationController>((key, value) => MapEntry(
+        key,
+        AnimationController(
+            vsync: this, duration: Duration(milliseconds: 200))));
+    _faders[widget.initialSelectedNavigatorKey].value = 1.0;
+    _navigatorKeys =
+        _items.map<T, Key>((key, value) => MapEntry(key, GlobalKey()));
   }
 
   @override
@@ -265,46 +277,67 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
               ),
       );
 
+  @override
+  void dispose() {
+    for (AnimationController controller in _faders.values) controller.dispose();
+    super.dispose();
+  }
+
   _buildScaffold() => StreamBuilder<T>(
         stream: _bloc.outSelectTab,
         initialData: _bloc.selectedNavigatorKey,
         builder: (_, snapshot) => Scaffold(
-              key: _scaffoldKey,
-              drawer: widget.drawer != null
-                  ? widget.drawer(
-                      _items,
-                      _bloc.selectedNavigatorKey,
-                      (key) => _bloc.select(key),
-                    )
-                  : null,
-              endDrawer: widget.endDrawer != null
-                  ? widget.endDrawer(
-                      _items,
-                      _bloc.selectedNavigatorKey,
-                      (key) => _bloc.select(key),
-                    )
-                  : null,
-              drawerDragStartBehavior: widget.drawerDragStartBehavior,
-              body: Stack(
-                  children: _items.keys
-                      .map((key) => _buildNavigator(key, snapshot.data))
-                      .toList()),
-              bottomNavigationBar: widget.showBottomNavigationBar
-                  ? StreamBuilder<bool>(
-                      initialData: true,
-                      stream: _bloc.outTabBarVisibility,
-                      builder: (_, snapshot) => snapshot.data
-                          ? _buildBottomNavigator()
-                          : Container(height: 0),
-                    )
-                  : null,
-            ),
+          key: _scaffoldKey,
+          drawer: widget.drawer != null
+              ? widget.drawer(
+                  _items,
+                  _bloc.selectedNavigatorKey,
+                  (key) => _bloc.select(key),
+                )
+              : null,
+          endDrawer: widget.endDrawer != null
+              ? widget.endDrawer(
+                  _items,
+                  _bloc.selectedNavigatorKey,
+                  (key) => _bloc.select(key),
+                )
+              : null,
+          drawerDragStartBehavior: widget.drawerDragStartBehavior,
+          body: Stack(
+              children: _items.keys
+                  .map((key) => _buildNavigator(key, snapshot.data))
+                  .toList()),
+          bottomNavigationBar: widget.showBottomNavigationBar
+              ? StreamBuilder<bool>(
+                  initialData: true,
+                  stream: _bloc.outTabBarVisibility,
+                  builder: (_, snapshot) => snapshot.data
+                      ? _buildBottomNavigator()
+                      : Container(height: 0),
+                )
+              : null,
+        ),
       );
 
-  Widget _buildNavigator(T key, T currentKey) => Offstage(
-        offstage: currentKey != key,
-        child: _items[key].navigator,
-      );
+  Widget _buildNavigator(T key, T currentKey) {
+    final Widget view = FadeTransition(
+        opacity: _faders[key].drive(CurveTween(curve: Curves.fastOutSlowIn)),
+        child: KeyedSubtree(
+            key: _navigatorKeys[key], child: _items[key].navigator));
+    if (key == currentKey) {
+      _faders[key].forward();
+    } else {
+      _faders[key].reverse();
+    }
+
+    return AnimatedBuilder(
+      animation: _faders[key].drive(CurveTween(curve: Curves.fastOutSlowIn)),
+      builder: (_, __) => Offstage(
+          offstage: key != currentKey && !_faders[key].isAnimating,
+          child:
+              IgnorePointer(ignoring: _faders[key].isAnimating, child: view)),
+    );
+  }
 
   Widget _buildNativeBottomNavigatorBar() => BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -317,10 +350,10 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
     return _items.entries
         .map(
           (entry) => widget.buildBottomNavigationItem(
-                entry.key,
-                entry.value,
-                _bloc.selectedNavigatorKey == entry.key,
-              ),
+            entry.key,
+            entry.value,
+            _bloc.selectedNavigatorKey == entry.key,
+          ),
         )
         .toList();
   }
