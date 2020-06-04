@@ -16,9 +16,7 @@ class NestedNavigatorItem {
       key: _navigatorKey,
       onGenerateRoute: (routeSettings) => routeSettings.name == _rootRouteName
           ? generateRoute(RouteSettings(
-              name: initialRoute,
-              isInitialRoute: true,
-              arguments: routeSettings.arguments))
+              name: initialRoute, arguments: routeSettings.arguments))
           : generateRoute(routeSettings),
     );
   }

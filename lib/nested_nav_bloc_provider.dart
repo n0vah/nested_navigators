@@ -27,7 +27,7 @@ class NestedNavigatorsBlocProvider extends StatefulWidget {
   /// Return a [NestedNavigatorsBloc] object if [context] from a child of [NestedNavigatorsBlocProvider] or [NestedNavigators].
   static NestedNavigatorsBloc of(BuildContext context) {
     NestedNavigatorsBlocProvider provider =
-        context.ancestorWidgetOfExactType(NestedNavigatorsBlocProvider);
+        context.findAncestorWidgetOfExactType<NestedNavigatorsBlocProvider>();
     return provider?.bloc;
   }
 }
