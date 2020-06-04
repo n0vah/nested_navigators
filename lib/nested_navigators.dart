@@ -272,36 +272,36 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
         stream: _bloc.outSelectTab,
         initialData: _bloc.selectedNavigatorKey,
         builder: (_, snapshot) => Scaffold(
-              key: _scaffoldKey,
-              drawer: widget.drawer != null
-                  ? widget.drawer(
-                      _items,
-                      _bloc.selectedNavigatorKey,
-                      (key) => _bloc.select(key),
-                    )
-                  : null,
-              endDrawer: widget.endDrawer != null
-                  ? widget.endDrawer(
-                      _items,
-                      _bloc.selectedNavigatorKey,
-                      (key) => _bloc.select(key),
-                    )
-                  : null,
-              drawerDragStartBehavior: widget.drawerDragStartBehavior,
-              body: Stack(
-                  children: _items.keys
-                      .map((key) => _buildNavigator(key, snapshot.data))
-                      .toList()),
-              bottomNavigationBar: widget.showBottomNavigationBar
-                  ? StreamBuilder<bool>(
-                      initialData: true,
-                      stream: _bloc.outTabBarVisibility,
-                      builder: (_, snapshot) => snapshot.data
-                          ? _buildBottomNavigator()
-                          : Container(height: 0),
-                    )
-                  : null,
-            ),
+          key: _scaffoldKey,
+          drawer: widget.drawer != null
+              ? widget.drawer(
+                  _items,
+                  _bloc.selectedNavigatorKey,
+                  (key) => _bloc.select(key),
+                )
+              : null,
+          endDrawer: widget.endDrawer != null
+              ? widget.endDrawer(
+                  _items,
+                  _bloc.selectedNavigatorKey,
+                  (key) => _bloc.select(key),
+                )
+              : null,
+          drawerDragStartBehavior: widget.drawerDragStartBehavior,
+          body: Stack(
+              children: _items.keys
+                  .map((key) => _buildNavigator(key, snapshot.data))
+                  .toList()),
+          bottomNavigationBar: widget.showBottomNavigationBar
+              ? StreamBuilder<bool>(
+                  initialData: true,
+                  stream: _bloc.outTabBarVisibility,
+                  builder: (_, snapshot) => snapshot.data
+                      ? _buildBottomNavigator()
+                      : Container(height: 0),
+                )
+              : null,
+        ),
       );
 
   Widget _buildNavigator(T key, T currentKey) => Offstage(
@@ -321,10 +321,10 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
     return _items.entries
         .map(
           (entry) => widget.buildBottomNavigationItem(
-                entry.key,
-                entry.value,
-                _bloc.selectedNavigatorKey == entry.key,
-              ),
+            entry.key,
+            entry.value,
+            _bloc.selectedNavigatorKey == entry.key,
+          ),
         )
         .toList();
   }
