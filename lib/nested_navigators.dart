@@ -213,7 +213,8 @@ class NestedNavigators<T> extends StatefulWidget {
   State<NestedNavigators> createState() => _NestedNavigatorsState<T>();
 }
 
-class _NestedNavigatorsState<T> extends State<NestedNavigators> {
+class _NestedNavigatorsState<T> extends State<NestedNavigators>
+    with TickerProviderStateMixin<NestedNavigators> {
   NestedNavigatorsBloc<T> _bloc;
   bool _hasBlocProviderInTree = false;
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey();
@@ -225,6 +226,9 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
   T _getNavigatorKeyByIndex(int index) => _items.keys.toList().elementAt(index);
 
   int _getNavigatorIndexByKey(T key) => _items.keys.toList().indexOf(key);
+
+  Map<T, AnimationController> _faders;
+  Map<T, Key> _navigatorKeys;
 
   @override
   void initState() {
@@ -254,6 +258,14 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
     _bloc.outActionWithScaffold.listen(
       (action) => action(_scaffoldKey.currentState),
     );
+
+    _faders = _items.map<T, AnimationController>((key, value) => MapEntry(
+        key,
+        AnimationController(
+            vsync: this, duration: Duration(milliseconds: 200))));
+    _faders[widget.initialSelectedNavigatorKey].value = 1.0;
+    _navigatorKeys =
+        _items.map<T, Key>((key, value) => MapEntry(key, GlobalKey()));
   }
 
   @override
@@ -267,6 +279,12 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
                 child: _buildScaffold(),
               ),
       );
+
+  @override
+  void dispose() {
+    for (AnimationController controller in _faders.values) controller.dispose();
+    super.dispose();
+  }
 
   _buildScaffold() => StreamBuilder<T>(
         stream: _bloc.outSelectTab,
@@ -304,10 +322,25 @@ class _NestedNavigatorsState<T> extends State<NestedNavigators> {
         ),
       );
 
-  Widget _buildNavigator(T key, T currentKey) => Offstage(
-        offstage: currentKey != key,
-        child: _items[key].navigator,
-      );
+  Widget _buildNavigator(T key, T currentKey) {
+    final Widget view = FadeTransition(
+        opacity: _faders[key].drive(CurveTween(curve: Curves.fastOutSlowIn)),
+        child: KeyedSubtree(
+            key: _navigatorKeys[key], child: _items[key].navigator));
+    if (key == currentKey) {
+      _faders[key].forward();
+    } else {
+      _faders[key].reverse();
+    }
+
+    return AnimatedBuilder(
+      animation: _faders[key].drive(CurveTween(curve: Curves.fastOutSlowIn)),
+      builder: (_, __) => Offstage(
+          offstage: key != currentKey && !_faders[key].isAnimating,
+          child:
+              IgnorePointer(ignoring: _faders[key].isAnimating, child: view)),
+    );
+  }
 
   Widget _buildNativeBottomNavigatorBar() => BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
